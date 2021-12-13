@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using KeyedSemaphores;
 
 namespace AsyncLockTests
 {
@@ -99,7 +100,6 @@ namespace AsyncLockTests
         {
             var mainAction = new Func<Task>(async () =>
             {
-                if (data?.Name == null) return;
                 if (!wait) await Task.Delay(100);
                 if (!_db.ContainsKey(data.Name))
                 {
@@ -110,12 +110,12 @@ namespace AsyncLockTests
 
             var lockingAction = new Func<Task>(async() =>
             {
-                using var lt = new LockTransaction<SampleData>(data.Name);
+                using var lt =await  KeyedSemaphore.LockAsync(data.Name);
                 await mainAction();
             });
             
             
-
+            if (data?.Name == null) return;
             if (useLocking)
             {
                 await lockingAction();
