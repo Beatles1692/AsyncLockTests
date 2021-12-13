@@ -32,6 +32,7 @@ namespace AsyncLockTests
             }
             catch(Exception exp)
             {
+                Assert.IsType<AggregateException>(exp);
                 Assert.NotNull(exp.InnerException);
                 Assert.IsType<ArgumentException>(exp.InnerException);
                 Assert.Equal("An item with the same key has already been added. Key: Same Name", exp.InnerException.Message);
